@@ -2,4 +2,7 @@
 plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.kotlin.android) apply false
+    //plugin to dagger hilt and about navigation
+    id ("com.google.dagger.hilt.android") version "2.48" apply false
+    id ("androidx.navigation.safeargs.kotlin") version "2.7.1" apply false
 }
