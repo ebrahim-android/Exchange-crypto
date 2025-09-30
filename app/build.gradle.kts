@@ -44,10 +44,16 @@ android {
 dependencies {
     val navVersion = "2.7.1"
     val daggerHilt = "2.48"
+    val retroGson = "2.9.0"
+    //val moshi = "1.15.0"
 
     //NavComponent
     implementation("androidx.navigation:navigation-fragment-ktx:$navVersion")
     implementation("androidx.navigation:navigation-ui-ktx:$navVersion")
+
+    //Retrofit
+    implementation("com.squareup.retrofit2:retrofit:$retroGson")
+    implementation("com.squareup.retrofit2:converter-gson:$retroGson")
 
     //DaggerHilt
     implementation("com.google.dagger:hilt-android:$daggerHilt")
@@ -55,6 +61,13 @@ dependencies {
 
     //Coil
     implementation("io.coil-kt:coil:2.4.0") // load image
+
+    // Moshi
+    //implementation("com.squareup.moshi:moshi:$moshi")
+    //implementation("com.squareup.moshi:moshi-kotlin:$moshi")
+
+    // to automatically generate the adapter with @JsonClass(generateAdapter = true)
+    //kapt("com.squareup.moshi:moshi-kotlin-codegen:$moshi")
 
 
     implementation(libs.androidx.core.ktx)
