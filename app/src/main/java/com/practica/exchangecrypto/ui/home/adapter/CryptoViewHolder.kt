@@ -17,7 +17,7 @@ class CryptoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val tvChange: TextView = itemView.findViewById((R.id.tvChange))
 
     fun bind(item: CryptoItem) {
-        //Load image from URL with Coil
+        // Load image from URL with Coil
         imgIcon.load(item.iconUrl) {
             crossfade(true)
             placeholder(R.drawable.ic_placeholder) // mientras carga
@@ -29,12 +29,26 @@ class CryptoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         tvSymbol.text = item.symbol
         tvPrice.text = item.price
 
-        // Verde o rojo según cambio
-        if (item.change.contains("-")) {
+        // --- LÓGICA DE SIGNO Y COLOR MODIFICADA ---
+        val changeText = item.change
+
+        if (changeText.contains("-")) {
+            // Es una bajada
+            tvChange.text = changeText
             tvChange.setTextColor(Color.RED)
+            // Asignar flecha hacia abajo
+            tvChange.setCompoundDrawablesWithIntrinsicBounds(
+                0, 0, R.drawable.ic_arrow_down, 0
+            )
         } else {
-            tvChange.setTextColor(Color.GREEN)
+            // Es una subida
+            tvChange.text = "+$changeText"
+            tvChange.setTextColor(Color.GREEN) // O Color.parseColor("#4CAF50")
+            // Asignar flecha hacia arriba
+            tvChange.setCompoundDrawablesWithIntrinsicBounds(
+                0, 0, R.drawable.ic_arrow_up, 0
+            )
         }
+        // ------------------------------------------
     }
 }
-
