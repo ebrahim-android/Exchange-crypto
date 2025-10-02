@@ -47,7 +47,7 @@ Copy code
 
 ## Screenshots
 
-<img width="332" height="760" alt="image" src="https://github.com/user-attachments/assets/23609dfd-0626-4c82-ba9d-669d8a8acc30" />
+<img width="232" height="550" alt="image" src="https://github.com/user-attachments/assets/23609dfd-0626-4c82-ba9d-669d8a8acc30" />
 
 ## How to Run
 
