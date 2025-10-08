@@ -5,5 +5,5 @@ data class CryptoItem(
     val symbol: String,
     val price: String,
     val change: String,
-    val iconUrl: String //Here we're gonna save the link from API){}
+    val iconUrl: String //Here we're gonna save the link from API
 )

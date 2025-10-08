@@ -10,10 +10,18 @@
         android:name="com.practica.exchangecrypto.ui.home.HomeFragment"
         android:label="fragment_home"
         tools:layout="@layout/fragment_home" >
+
+        <!-- Acción hacia Search -->
         <action
             android:id="@+id/action_homeFragment_to_searchFragment"
             app:destination="@id/searchFragment" />
+
+        <!-- 🚀 Acción hacia Detail -->
+        <action
+            android:id="@+id/action_homeFragment_to_detailFragment"
+            app:destination="@id/detailFragment" />
     </fragment>
+
     <fragment
         android:id="@+id/searchFragment"
         android:name="com.practica.exchangecrypto.ui.search.SearchFragment"
@@ -23,9 +31,22 @@
             android:id="@+id/action_searchFragment_to_favoritesFragment"
             app:destination="@id/favoritesFragment" />
     </fragment>
+
     <fragment
         android:id="@+id/favoritesFragment"
         android:name="com.practica.exchangecrypto.ui.favorites.FavoritesFragment"
         android:label="fragment_favorites"
         tools:layout="@layout/fragment_favorites" />
+
+    <fragment
+        android:id="@+id/detailFragment"
+        android:name="com.practica.exchangecrypto.ui.detail.DetailFragment"
+        android:label="DetailFragment"
+        tools:layout="@layout/fragment_detail" >
+
+        <!-- Acción opcional de regreso -->
+        <action
+            android:id="@+id/action_detailFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+    </fragment>
 </navigation>

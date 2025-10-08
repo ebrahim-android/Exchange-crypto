@@ -9,8 +9,10 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
+import com.practica.exchangecrypto.R
 import com.practica.exchangecrypto.databinding.FragmentHomeBinding
 import com.practica.exchangecrypto.domain.state.UiState
 import com.practica.exchangecrypto.ui.home.adapter.CryptoAdapter
@@ -41,36 +43,38 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         // ---------- Adapter vertical ----------
-        cryptoAdapter = CryptoAdapter(emptyList())
+        cryptoAdapter = CryptoAdapter(emptyList()) { selectedCrypto ->
+            // 🔹 Basic navigation without passing data yet
+            findNavController().navigate(R.id.action_homeFragment_to_detailFragment)
+        }
+
+        // We assign the vertical adapter
         binding.rvCrypto.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = cryptoAdapter
         }
 
-        // ---------- Adapter horizontal ----------
+        // ---------- horizontal Adapter ----------
         cryptoHorizontalAdapter = CryptoHorizontalAdapter(emptyList())
         binding.rvTopCryptos.apply {
             layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
             adapter = cryptoHorizontalAdapter
         }
 
-        // ---------- Observar estado del ViewModel ----------
+        // ---------- Observe the state of the ViewModel ----------
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 vm.uiState.collect { state ->
                     when (state) {
-                        is UiState.Loading -> {
-                            binding.progressBar.visibility = View.VISIBLE
-                        }
+                        is UiState.Loading -> binding.progressBar.visibility = View.VISIBLE
+
                         is UiState.Success -> {
                             binding.progressBar.visibility = View.GONE
 
-                            // Ejemplo: primeras 5 cryptos → horizontal, el resto → vertical
                             val topCryptos = state.data.take(5)
                             val allCryptos = state.data
 
                             cryptoHorizontalAdapter.updateList(topCryptos.map {
-                                // Adaptación al modelo de UI horizontal
                                 com.practica.exchangecrypto.ui.model.CryptoHorizontal(
                                     name = it.name,
                                     symbol = it.symbol,
@@ -81,7 +85,6 @@ class HomeFragment : Fragment() {
                             })
 
                             cryptoAdapter.updateList(allCryptos.map {
-                                // Adaptación al modelo de UI vertical
                                 com.practica.exchangecrypto.ui.model.CryptoItem(
                                     name = it.name,
                                     symbol = it.symbol,
@@ -91,6 +94,7 @@ class HomeFragment : Fragment() {
                                 )
                             })
                         }
+
                         is UiState.Error -> {
                             binding.progressBar.visibility = View.GONE
                             Snackbar.make(binding.root, "Error: ${state.message}", Snackbar.LENGTH_LONG).show()
@@ -100,7 +104,7 @@ class HomeFragment : Fragment() {
             }
         }
 
-        // ---------- Paginación (cuando llegue al final de la lista) ----------
+        // ---------- Pagination ----------
         binding.rvCrypto.addOnScrollListener(object : androidx.recyclerview.widget.RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: androidx.recyclerview.widget.RecyclerView, dx: Int, dy: Int) {
                 val lm = recyclerView.layoutManager as LinearLayoutManager
