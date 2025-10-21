@@ -1,6 +1,8 @@
 package com.practica.exchangecrypto.data.remote
 
+
 import android.content.Context
+import com.practica.exchangecrypto.data.remote.api.CoinGeckoApi
 import com.practica.exchangecrypto.data.remote.api.CoinGeckoService
 import com.practica.exchangecrypto.data.repository.CryptoRepositoryImpl
 import com.practica.exchangecrypto.domain.repository.CryptoRepository
@@ -15,17 +17,16 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.File
 
-@Module // provide dependencies
-@InstallIn(SingletonComponent::class) // to limit of the instances
+@Module
+@InstallIn(SingletonComponent::class)
 object NetworkModule {
 
     @Provides
-    fun provideOkHttpClient(@ApplicationContext ctx: Context): OkHttpClient{
+    fun provideOkHttpClient(@ApplicationContext ctx: Context): OkHttpClient {
         val builder = OkHttpClient.Builder()
 
-        val cacheSize = 10L * 1024 * 1024 //10 MB
-        builder.cache(Cache(File(ctx.cacheDir, "http_cache"), cacheSize)) // It will save 10 MB of cache
-                                                                               //to avoid downloading more information, use less data, it's faster, etc.
+        val cacheSize = 10L * 1024 * 1024 // 10 MB
+        builder.cache(Cache(File(ctx.cacheDir, "http_cache"), cacheSize))
         return builder.build()
     }
 
@@ -37,33 +38,16 @@ object NetworkModule {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
-    @Provides
+    @Provides // principal service (list of cryptos)
     fun provideService(retrofit: Retrofit): CoinGeckoService =
         retrofit.create(CoinGeckoService::class.java)
 
-    @Provides
+    @Provides // new service for details and graphics
+    fun provideCoinGeckoApi(retrofit: Retrofit): CoinGeckoApi =
+        retrofit.create(CoinGeckoApi::class.java)
+
+    @Provides // main repository (list)
     fun provideRepo(service: CoinGeckoService): CryptoRepository =
         CryptoRepositoryImpl(service)
+
 }
-
-
-//
-//    @Provides
-//    fun provideMoshi(): Moshi = Moshi.Builder().build()
-//
-//    @Provides
-//    fun provideRetrofit(client: OkHttpClient, moshi: Moshi): Retrofit =
-//        Retrofit.Builder()
-//            .baseUrl("https://api.coingecko.com/api/v3/")
-//            .client(client)
-//            .addConverterFactory(MoshiConverterFactory.create(moshi))
-//            .build()
-//
-//    @Provides
-//    fun provideService(retrofit: Retrofit): CoinGeckoService =
-//        retrofit.create(CoinGeckoService::class.java)
-//
-//    @Provides
-//    fun provideRepo(service: CoinGeckoService): CryptoRepository =
-//        CryptoRepositoryImpl(service)
-//}

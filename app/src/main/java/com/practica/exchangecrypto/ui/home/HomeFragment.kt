@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -44,8 +45,8 @@ class HomeFragment : Fragment() {
 
         // ---------- Adapter vertical ----------
         cryptoAdapter = CryptoAdapter(emptyList()) { selectedCrypto ->
-            // 🔹 Basic navigation without passing data yet
-            findNavController().navigate(R.id.action_homeFragment_to_detailFragment)
+            val bundle = bundleOf("cryptoId" to selectedCrypto.id)
+            findNavController().navigate(R.id.action_homeFragment_to_detailFragment, bundle)
         }
 
         // We assign the vertical adapter
@@ -86,6 +87,7 @@ class HomeFragment : Fragment() {
 
                             cryptoAdapter.updateList(allCryptos.map {
                                 com.practica.exchangecrypto.ui.model.CryptoItem(
+                                    id = it.id,
                                     name = it.name,
                                     symbol = it.symbol,
                                     price = "$${it.currentPrice}",

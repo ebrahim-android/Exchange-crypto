@@ -43,6 +43,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.benchmark.common)
     val navVersion = "2.7.1"
     val daggerHilt = "2.48"
     val retroGson = "2.9.0"
@@ -59,15 +60,11 @@ dependencies {
     implementation("com.google.dagger:hilt-android:$daggerHilt")
     kapt("com.google.dagger:hilt-compiler:$daggerHilt")
 
-    // Coil (images)
+    // Coil (image)
     implementation("io.coil-kt:coil:2.4.0")
 
-    // MPAndroidChart (gráficas)
+    // MPAndroidChart (graphics)
     implementation("com.github.PhilJay:MPAndroidChart:3.1.0")
-
-    // SafeArgs plugin no va en dependencies (ya lo tienes en plugins arriba)
-    // → elimino esta línea que tenías de más:
-    // implementation("androidx.navigation:navigation-safe-args-gradle-plugin:2.7.7")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

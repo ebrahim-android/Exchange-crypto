@@ -1,7 +1,6 @@
 package com.practica.exchangecrypto.data.remote.dto
 
 import com.google.gson.annotations.SerializedName
-import com.practica.exchangecrypto.domain.model.CryptoModel
 
 data class CoinMarketDto(
     val id: String,
