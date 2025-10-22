@@ -8,7 +8,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -48,13 +47,13 @@ class DetailFragment : Fragment() {
         binding.ivBack.setOnClickListener { requireActivity().onBackPressed() }
 
         val cryptoId = arguments?.getString("cryptoId")
-        Log.d("DetailFragment", "Crypto ID recibido: $cryptoId")
+        Log.d("DetailFragment", "Crypto ID received: $cryptoId")
         if (cryptoId == null) return
 
         currentCryptoId = cryptoId.lowercase()
         vm.loadCryptoDetail(currentCryptoId!!, "7")
 
-        // --- Botones de rango ---
+        // --- Time range buttons ---
         binding.btn1D.setOnClickListener {
             updateChart("1")
             updateSelectedButton(binding.btn1D)
@@ -102,7 +101,7 @@ class DetailFragment : Fragment() {
                                     "$${formatNumber(c.high24h)} / $${formatNumber(c.low24h)}"
                                 else "—"
 
-                            Log.d("MARKET_DATA", "Gráfico recibido: ${c.history.size} puntos para rango $selectedDays")
+                            Log.d("MARKET_DATA", "Chart received: ${c.history.size} points for range $selectedDays")
                             setupChart(c.history)
                         }
 
@@ -117,13 +116,24 @@ class DetailFragment : Fragment() {
 
     // --- Set up the chart ---
     private fun setupChart(history: List<Double>) {
+        if (history.isEmpty()) return
+
         val entries = history.mapIndexed { index, value -> Entry(index.toFloat(), value.toFloat()) }
+
+        // 🔴🟢 Dynamic line color based on price trend
+        // If the last price is lower than the first, the line turns red (downtrend)
+        // Otherwise, it turns green (uptrend)
+        val startPrice = history.first()
+        val endPrice = history.last()
+        val lineColor = if (endPrice < startPrice) Color.parseColor("#FF6666") else Color.parseColor("#4CAF50")
+
         val dataSet = LineDataSet(entries, "Price").apply {
             setDrawValues(false)
             setDrawCircles(false)
             lineWidth = 2f
-            color = Color.parseColor("#4CAF50")
+            color = lineColor
         }
+
         binding.lineChart.apply {
             data = LineData(dataSet)
             description.isEnabled = false
@@ -148,7 +158,7 @@ class DetailFragment : Fragment() {
         }
     }
 
-    // --- Change rank ---
+    // --- Change range ---
     private fun updateChart(days: String) {
         currentCryptoId?.let { id ->
             selectedDays = days
@@ -156,7 +166,7 @@ class DetailFragment : Fragment() {
 
             viewLifecycleOwner.lifecycleScope.launch {
                 vm.loadCryptoDetail(id, days)
-                Log.d("MARKET_DATA", "Solicitando datos: ID = $id | Days = $days")
+                Log.d("MARKET_DATA", "Requesting data: ID = $id | Days = $days")
             }
         }
     }
