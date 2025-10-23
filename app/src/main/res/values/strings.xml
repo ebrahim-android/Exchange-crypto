@@ -5,4 +5,9 @@
 
     <!-- homeFragment -->
     <string name="Trending">Trending</string>
+    <!-- searchFragment -->
+    <string name="search_crypto">Search cryptocurrency...</string>
+    <string name="search">Search</string>
+
+
 </resources>
