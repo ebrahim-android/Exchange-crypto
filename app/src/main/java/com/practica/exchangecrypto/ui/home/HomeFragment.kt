@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -18,6 +19,7 @@ import com.practica.exchangecrypto.databinding.FragmentHomeBinding
 import com.practica.exchangecrypto.domain.state.UiState
 import com.practica.exchangecrypto.ui.home.adapter.CryptoAdapter
 import com.practica.exchangecrypto.ui.home.adapter.CryptoHorizontalAdapter
+import com.practica.exchangecrypto.ui.shared.SharedCryptoViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -31,6 +33,8 @@ class HomeFragment : Fragment() {
 
     private lateinit var cryptoAdapter: CryptoAdapter
     private lateinit var cryptoHorizontalAdapter: CryptoHorizontalAdapter
+
+    private val sharedViewModel: SharedCryptoViewModel by activityViewModels() //shared view model for search fragment
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -75,6 +79,8 @@ class HomeFragment : Fragment() {
                             val topCryptos = state.data.take(5)
                             val allCryptos = state.data
 
+                            //sharedViewModel.setCryptoList(allCryptos)// to pass the list to the search fragment
+
                             cryptoHorizontalAdapter.updateList(topCryptos.map {
                                 com.practica.exchangecrypto.ui.model.CryptoHorizontal(
                                     name = it.name,
@@ -86,6 +92,17 @@ class HomeFragment : Fragment() {
                             })
 
                             cryptoAdapter.updateList(allCryptos.map {
+                                com.practica.exchangecrypto.ui.model.CryptoItem(
+                                    id = it.id,
+                                    name = it.name,
+                                    symbol = it.symbol,
+                                    price = "$${it.currentPrice}",
+                                    change = "${it.priceChange24h}%",
+                                    iconUrl = it.imageUrl
+                                )
+                            })
+
+                            sharedViewModel.setCryptoList(allCryptos.map {
                                 com.practica.exchangecrypto.ui.model.CryptoItem(
                                     id = it.id,
                                     name = it.name,
