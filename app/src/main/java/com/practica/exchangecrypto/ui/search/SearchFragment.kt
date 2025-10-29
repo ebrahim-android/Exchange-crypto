@@ -1,20 +1,21 @@
 package com.practica.exchangecrypto.ui.search
 
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
+import androidx.core.os.bundleOf
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.practica.exchangecrypto.R
 import com.practica.exchangecrypto.databinding.FragmentSearchBinding
 import com.practica.exchangecrypto.ui.home.adapter.CryptoAdapter
+import com.practica.exchangecrypto.ui.model.CryptoItem
 import com.practica.exchangecrypto.ui.shared.SharedCryptoViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
@@ -27,7 +28,7 @@ class SearchFragment : Fragment() {
     private var _binding: FragmentSearchBinding? = null
     private val binding get() = _binding!!
 
-    private val sharedViewModel: SharedCryptoViewModel by activityViewModels()
+    private val sharedViewModel: SharedCryptoViewModel by activityViewModels() // to get the list from HomeFragment
 
     private lateinit var cryptoAdapter: CryptoAdapter
 
@@ -43,7 +44,7 @@ class SearchFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.ivBack.setOnClickListener { requireActivity().onBackPressed() }
-
+        // animation for search bar
         binding.etSearch.apply {
             translationY = 200f
             alpha = 0f
@@ -55,7 +56,11 @@ class SearchFragment : Fragment() {
                 .setStartDelay(200)
                 .start()
         }
-        cryptoAdapter = CryptoAdapter(emptyList()) { /* click no necesario aquí */ }
+        // to navigate to detailFragment
+        cryptoAdapter = CryptoAdapter(emptyList()) { crypto ->
+            sharedViewModel.selectCrypto(crypto)
+            findNavController().navigate(R.id.action_searchFragment_to_detailFragment)
+        }
 
         binding.rvSearchResults.apply {
             layoutManager = LinearLayoutManager(requireContext())
@@ -67,20 +72,20 @@ class SearchFragment : Fragment() {
             cryptoAdapter.updateList(fullList)
         }
 
-        // Filtro dinámico
+        // dynamic filter
         var searchJob: Job? = null
 
         binding.etSearch.doOnTextChanged { text, _, _, _ ->
-            searchJob?.cancel() // Cancelamos la búsqueda anterior si el usuario sigue escribiendo
+            searchJob?.cancel() // We cancel the previous search if the user is typing
             searchJob = viewLifecycleOwner.lifecycleScope.launch {
-                delay(250) // Espera 250ms antes de ejecutar el filtro (debounce)
+                delay(250) // Wait 250ms before executing the filter (debounce)
                 val query = text.toString().trim().lowercase()
 
                 val filteredList = sharedViewModel.cryptoList.value?.filter {
                     it.name.lowercase().contains(query) || it.symbol.lowercase().contains(query)
                 } ?: emptyList()
 
-                // Animación de entrada suave
+                // Smooth entrance animation
                 val fadeIn = AnimationUtils.loadAnimation(requireContext(), R.anim.fade_in)
                 binding.rvSearchResults.startAnimation(fadeIn)
 

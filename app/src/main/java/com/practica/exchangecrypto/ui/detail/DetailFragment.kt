@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -19,6 +20,7 @@ import com.github.mikephil.charting.data.LineDataSet
 import com.practica.exchangecrypto.R
 import com.practica.exchangecrypto.databinding.FragmentDetailBinding
 import com.practica.exchangecrypto.domain.state.UiState
+import com.practica.exchangecrypto.ui.shared.SharedCryptoViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -32,6 +34,8 @@ class DetailFragment : Fragment() {
     private var currentCryptoId: String? = null
 
     private val vm: DetailViewModel by viewModels()
+    private val sharedViewModel: SharedCryptoViewModel by activityViewModels() // to get the selected crypto from searchFragment or homeFragment
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -46,12 +50,14 @@ class DetailFragment : Fragment() {
 
         binding.ivBack.setOnClickListener { requireActivity().onBackPressed() }
 
-        val cryptoId = arguments?.getString("cryptoId")
-        Log.d("DetailFragment", "Crypto ID received: $cryptoId")
-        if (cryptoId == null) return
-
-        currentCryptoId = cryptoId.lowercase()
-        vm.loadCryptoDetail(currentCryptoId!!, "7")
+        // --- We observe the selected crypto from SharedCryptoViewModel ---
+        // If a crypto is selected, we load its detail, it from searchFragment or homeFragment
+        sharedViewModel.selectedCrypto.observe(viewLifecycleOwner) { crypto ->
+            if (crypto != null) {
+                currentCryptoId = crypto.id.lowercase()
+                vm.loadCryptoDetail(currentCryptoId!!, selectedDays)
+            }
+        }
 
         // --- Time range buttons ---
         binding.btn1D.setOnClickListener {
@@ -104,7 +110,6 @@ class DetailFragment : Fragment() {
                             Log.d("MARKET_DATA", "Chart received: ${c.history.size} points for range $selectedDays")
                             setupChart(c.history)
                         }
-
                         is UiState.Error -> {
                             binding.progressBar.visibility = View.GONE
                         }
@@ -120,7 +125,7 @@ class DetailFragment : Fragment() {
 
         val entries = history.mapIndexed { index, value -> Entry(index.toFloat(), value.toFloat()) }
 
-        // 🔴🟢 Dynamic line color based on price trend
+         // 🔴🟢 Dynamic line color based on price trend
         // If the last price is lower than the first, the line turns red (downtrend)
         // Otherwise, it turns green (uptrend)
         val startPrice = history.first()
@@ -154,7 +159,7 @@ class DetailFragment : Fragment() {
             abs >= 1_000_000_000 -> String.format("$%,.2fB", value / 1_000_000_000)
             abs >= 1_000_000 -> String.format("$%,.2fM", value / 1_000_000)
             abs >= 1_000 -> String.format("$%,.2fK", value / 1_000)
-            else -> String.format("$%,.2f", value)
+            else -> String.format("%,.2f", value)
         }
     }
 
@@ -164,7 +169,7 @@ class DetailFragment : Fragment() {
             selectedDays = days
             binding.progressBar.visibility = View.VISIBLE
 
-            viewLifecycleOwner.lifecycleScope.launch {
+            lifecycleScope.launch {
                 vm.loadCryptoDetail(id, days)
                 Log.d("MARKET_DATA", "Requesting data: ID = $id | Days = $days")
             }

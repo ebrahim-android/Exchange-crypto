@@ -48,9 +48,9 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         // ---------- Adapter vertical ----------
-        cryptoAdapter = CryptoAdapter(emptyList()) { selectedCrypto ->
-            val bundle = bundleOf("cryptoId" to selectedCrypto.id)
-            findNavController().navigate(R.id.action_homeFragment_to_detailFragment, bundle)
+        cryptoAdapter = CryptoAdapter(emptyList()) { crypto ->
+            sharedViewModel.selectCrypto(crypto)
+            findNavController().navigate(R.id.action_homeFragment_to_detailFragment)
         }
 
         // We assign the vertical adapter
