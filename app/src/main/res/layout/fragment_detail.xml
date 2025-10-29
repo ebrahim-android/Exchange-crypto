@@ -56,13 +56,12 @@
                     android:layout_weight="1" />
 
                 <ImageView
-                    android:id="@+id/ivMic"
+                    android:id="@+id/ivFavorite"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:layout_gravity="center_vertical"
                     android:layout_marginEnd="20dp"
-                    android:contentDescription="Micrófono"
-                    android:src="@drawable/ic_mic"
+                    android:src="@drawable/ic_favorite"
                     app:tint="#FFFFFF" />
             </LinearLayout>
 
