@@ -93,7 +93,7 @@ Copy code
   &nbsp;&nbsp;&nbsp;
   <img width="230" height="500" alt="Detail Screen" src="https://github.com/user-attachments/assets/0e725906-2981-4a86-9f87-f5603ca08381" />
   &nbsp;&nbsp;&nbsp;
-  <img width="230" height="500" alt="Search Screen" src="https://github.com/user-attachments/assets/cc5f3364-31a2-46be-b83f-1a70d3c00834" />
+  <img width="240" height="500" alt="Search Screen" src="https://github.com/user-attachments/assets/cc5f3364-31a2-46be-b83f-1a70d3c00834" />
 </p>
 
 ---
