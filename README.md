@@ -89,11 +89,11 @@ Copy code
 ## 🖼️ Screenshots
 
 <p align="center">
-  <img width="230" height="500" alt="Home Screen" src="https://github.com/user-attachments/assets/23609dfd-0626-4c82-ba9d-669d8a8acc30" />
+  <img width="230" height="500" alt="image" src="https://github.com/user-attachments/assets/3c7cab30-9bff-43a8-8e32-b09954ba299e" />
   &nbsp;&nbsp;&nbsp;
   <img width="230" height="500" alt="Detail Screen" src="https://github.com/user-attachments/assets/0e725906-2981-4a86-9f87-f5603ca08381" />
   &nbsp;&nbsp;&nbsp;
-  <img width="240" height="500" alt="Search Screen" src="https://github.com/user-attachments/assets/cc5f3364-31a2-46be-b83f-1a70d3c00834" />
+ <img width="240" height="500" alt="image" src="https://github.com/user-attachments/assets/047a7260-bfb9-407e-9f58-fc8820bac675" />
 </p>
 
 ---
