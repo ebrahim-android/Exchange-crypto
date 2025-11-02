@@ -12,7 +12,7 @@ interface CoinGeckoService {
         @Query("order") order: String = "market_cap_desc",
         @Query("per_page") per_page: Int = 50,
         @Query("page") page: Int = 1,
-        @Query("sparkline") sparkline: Boolean = false,
+        @Query("sparkline") sparkline: Boolean = true,
         @Query("price_change_percentage") price_change_percentage: String? = null
     ): List<CoinMarketDto>
 }

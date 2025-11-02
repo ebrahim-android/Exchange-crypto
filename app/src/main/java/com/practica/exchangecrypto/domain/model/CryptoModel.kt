@@ -9,5 +9,6 @@ data class CryptoModel(
     val imageUrl: String,
     val currentPrice: Double,
     val marketCap: Long?,
-    val priceChange24h: Double?
+    val priceChange24h: Double?,
+    val sparkline: List<Double> = emptyList()
 )

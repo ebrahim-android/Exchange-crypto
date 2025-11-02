@@ -57,7 +57,7 @@ class SearchFragment : Fragment() {
                 .start()
         }
         // to navigate to detailFragment
-        cryptoAdapter = CryptoAdapter(emptyList()) { crypto ->
+        cryptoAdapter = CryptoAdapter(emptyList(), sharedViewModel) { crypto ->
             sharedViewModel.selectCrypto(crypto)
             findNavController().navigate(R.id.action_searchFragment_to_detailFragment)
         }

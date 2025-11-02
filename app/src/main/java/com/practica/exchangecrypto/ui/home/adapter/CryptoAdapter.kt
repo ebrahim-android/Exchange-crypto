@@ -5,9 +5,11 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.practica.exchangecrypto.R
 import com.practica.exchangecrypto.ui.model.CryptoItem
+import com.practica.exchangecrypto.ui.shared.SharedCryptoViewModel
 
 class CryptoAdapter(
     private var items: List<CryptoItem>,
+    private val sharedViewModel: SharedCryptoViewModel, // we inject the SharedCryptoViewModel
     private val onItemClick: (CryptoItem) -> Unit
 ) : RecyclerView.Adapter<CryptoViewHolder>() {
 
@@ -21,6 +23,7 @@ class CryptoAdapter(
             LayoutInflater.from(parent.context).inflate(R.layout.item_crypto, parent, false)
         )
     }
+
     override fun getItemCount() = items.size
 
     override fun onBindViewHolder(holder: CryptoViewHolder, position: Int) {
@@ -29,6 +32,8 @@ class CryptoAdapter(
         holder.itemView.setOnClickListener {
             onItemClick(item) // we pass the selected CryptoItem
         }
+
     }
 }
+
 

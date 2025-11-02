@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -30,11 +29,13 @@ class HomeFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val vm: HomeViewModel by viewModels()
+    private val sharedViewModel: SharedCryptoViewModel by activityViewModels()
 
     private lateinit var cryptoAdapter: CryptoAdapter
     private lateinit var cryptoHorizontalAdapter: CryptoHorizontalAdapter
 
-    private val sharedViewModel: SharedCryptoViewModel by activityViewModels() //shared view model for search fragment
+    private var currentPage = 1
+    private val perPage = 50
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -47,26 +48,24 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // ---------- Adapter vertical ----------
-        cryptoAdapter = CryptoAdapter(emptyList()) { crypto ->
+        // ---------- Vertical Adapter ----------
+        cryptoAdapter = CryptoAdapter(emptyList(), sharedViewModel) { crypto ->
             sharedViewModel.selectCrypto(crypto)
             findNavController().navigate(R.id.action_homeFragment_to_detailFragment)
         }
-
-        // We assign the vertical adapter
         binding.rvCrypto.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = cryptoAdapter
         }
 
-        // ---------- horizontal Adapter ----------
+        // ---------- Horizontal Adapter ----------
         cryptoHorizontalAdapter = CryptoHorizontalAdapter(emptyList())
         binding.rvTopCryptos.apply {
             layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
             adapter = cryptoHorizontalAdapter
         }
 
-        // ---------- Observe the state of the ViewModel ----------
+        // ---------- Observe ViewModel ----------
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 vm.uiState.collect { state ->
@@ -76,22 +75,14 @@ class HomeFragment : Fragment() {
                         is UiState.Success -> {
                             binding.progressBar.visibility = View.GONE
 
-                            val topCryptos = state.data.take(5)
                             val allCryptos = state.data
 
-                            //sharedViewModel.setCryptoList(allCryptos)// to pass the list to the search fragment
+                            // --- Top 5 horizontal ---
+                            val topCryptos = allCryptos.take(5).map { it.toHorizontal() }
+                            cryptoHorizontalAdapter.updateList(topCryptos)
 
-                            cryptoHorizontalAdapter.updateList(topCryptos.map {
-                                com.practica.exchangecrypto.ui.model.CryptoHorizontal(
-                                    name = it.name,
-                                    symbol = it.symbol,
-                                    price = "$${it.currentPrice}",
-                                    change = "${it.priceChange24h}%",
-                                    iconUrl = it.imageUrl
-                                )
-                            })
-
-                            cryptoAdapter.updateList(allCryptos.map {
+                            // --- Vertical list ---
+                            val verticalList = allCryptos.map {
                                 com.practica.exchangecrypto.ui.model.CryptoItem(
                                     id = it.id,
                                     name = it.name,
@@ -100,18 +91,11 @@ class HomeFragment : Fragment() {
                                     change = "${it.priceChange24h}%",
                                     iconUrl = it.imageUrl
                                 )
-                            })
+                            }
+                            cryptoAdapter.updateList(verticalList)
 
-                            sharedViewModel.setCryptoList(allCryptos.map {
-                                com.practica.exchangecrypto.ui.model.CryptoItem(
-                                    id = it.id,
-                                    name = it.name,
-                                    symbol = it.symbol,
-                                    price = "$${it.currentPrice}",
-                                    change = "${it.priceChange24h}%",
-                                    iconUrl = it.imageUrl
-                                )
-                            })
+                            // --- Share with SearchFragment ---
+                            sharedViewModel.setCryptoList(verticalList)
                         }
 
                         is UiState.Error -> {
@@ -127,9 +111,10 @@ class HomeFragment : Fragment() {
         binding.rvCrypto.addOnScrollListener(object : androidx.recyclerview.widget.RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: androidx.recyclerview.widget.RecyclerView, dx: Int, dy: Int) {
                 val lm = recyclerView.layoutManager as LinearLayoutManager
-                val last = lm.findLastVisibleItemPosition()
-                if (last >= (cryptoAdapter.itemCount - 5)) {
-                    vm.loadNextPage()
+                val lastVisible = lm.findLastVisibleItemPosition()
+                if (lastVisible >= (cryptoAdapter.itemCount - 5)) {
+                    currentPage += 1
+                    vm.loadMarkets(currentPage)
                 }
             }
         })

@@ -66,6 +66,9 @@ dependencies {
     // MPAndroidChart (graphics)
     implementation("com.github.PhilJay:MPAndroidChart:3.1.0")
 
+    // Spark (graphics) a little
+    implementation("com.robinhood.spark:spark:1.2.0")
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

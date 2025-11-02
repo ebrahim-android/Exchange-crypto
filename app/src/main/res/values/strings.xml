@@ -4,7 +4,7 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
     <!-- homeFragment -->
-    <string name="Trending">Trending</string>
+    <string name="Top">Top 5</string>
     <!-- searchFragment -->
     <string name="search_crypto">Search cryptocurrency...</string>
     <string name="search">Search</string>

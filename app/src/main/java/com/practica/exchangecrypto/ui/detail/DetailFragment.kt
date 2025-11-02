@@ -20,6 +20,7 @@ import com.github.mikephil.charting.data.LineDataSet
 import com.practica.exchangecrypto.R
 import com.practica.exchangecrypto.databinding.FragmentDetailBinding
 import com.practica.exchangecrypto.domain.state.UiState
+import com.practica.exchangecrypto.ui.model.CryptoItem
 import com.practica.exchangecrypto.ui.shared.SharedCryptoViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -34,8 +35,9 @@ class DetailFragment : Fragment() {
     private var currentCryptoId: String? = null
 
     private val vm: DetailViewModel by viewModels()
-    private val sharedViewModel: SharedCryptoViewModel by activityViewModels() // to get the selected crypto from searchFragment or homeFragment
+    private val sharedViewModel: SharedCryptoViewModel by activityViewModels()
 
+    private var currentCrypto: CryptoItem? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -50,38 +52,53 @@ class DetailFragment : Fragment() {
 
         binding.ivBack.setOnClickListener { requireActivity().onBackPressed() }
 
-        // --- We observe the selected crypto from SharedCryptoViewModel ---
-        // If a crypto is selected, we load its detail, it from searchFragment or homeFragment
+        currentCrypto = arguments?.getParcelable("crypto")
+
+        // --- Observamos la crypto seleccionada ---
         sharedViewModel.selectedCrypto.observe(viewLifecycleOwner) { crypto ->
             if (crypto != null) {
+                currentCrypto = crypto
                 currentCryptoId = crypto.id.lowercase()
                 vm.loadCryptoDetail(currentCryptoId!!, selectedDays)
+
+                // 🔹 Comprobamos si ya está en favoritos
+                val isFav = sharedViewModel.isFavotire(crypto)
+                updateFavoriteIcon(isFav)
+
+                // 🔹 Evento click del ícono de favorito
+                binding.ivFavorite.setOnClickListener {
+                    sharedViewModel.toggleFavorite(crypto)
+                    val newState = !isFav
+                    updateFavoriteIcon(newState)
+                }
             }
         }
 
-        // --- Time range buttons ---
-        binding.btn1D.setOnClickListener {
-            updateChart("1")
-            updateSelectedButton(binding.btn1D)
+        binding.ivFavorite.setOnClickListener {
+            currentCrypto?.let { crypto ->
+                sharedViewModel.toggleFavorite(crypto)
+                updateFavoriteIcon(!sharedViewModel.isFavotire(crypto))
+            }
         }
-        binding.btn1W.setOnClickListener {
-            updateChart("7")
-            updateSelectedButton(binding.btn1W)
-        }
-        binding.btn1M.setOnClickListener {
-            updateChart("30")
-            updateSelectedButton(binding.btn1M)
-        }
-        binding.btn6M.setOnClickListener {
-            updateChart("180")
-            updateSelectedButton(binding.btn6M)
-        }
-        binding.btn1Y.setOnClickListener {
-            updateChart("365")
-            updateSelectedButton(binding.btn1Y)
-        }
+        currentCrypto?.let { updateFavoriteIcon(sharedViewModel.isFavotire(it)) }
 
-        // --- We observe the changes in detail ---
+
+        // --- Botones de rango ---
+        setupTimeRangeButtons()
+
+        // --- Observamos el estado del detalle ---
+        observeDetailState()
+    }
+
+    // --- Actualiza el ícono del favorito ---
+    private fun updateFavoriteIcon(isFavorite: Boolean) {
+        val isFavorite = sharedViewModel.isFavotire(currentCrypto!!)
+        val iconRes = if (isFavorite) R.drawable.ic_favorite_complete else R.drawable.ic_favorite
+        binding.ivFavorite.setImageResource(iconRes)
+    }
+
+    // --- Observa el estado del detalle ---
+    private fun observeDetailState() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 vm.uiState.collect { state ->
@@ -119,15 +136,36 @@ class DetailFragment : Fragment() {
         }
     }
 
-    // --- Set up the chart ---
+    // --- Configura los botones de rango de tiempo ---
+    private fun setupTimeRangeButtons() {
+        binding.btn1D.setOnClickListener {
+            updateChart("1")
+            updateSelectedButton(binding.btn1D)
+        }
+        binding.btn1W.setOnClickListener {
+            updateChart("7")
+            updateSelectedButton(binding.btn1W)
+        }
+        binding.btn1M.setOnClickListener {
+            updateChart("30")
+            updateSelectedButton(binding.btn1M)
+        }
+        binding.btn6M.setOnClickListener {
+            updateChart("180")
+            updateSelectedButton(binding.btn6M)
+        }
+        binding.btn1Y.setOnClickListener {
+            updateChart("365")
+            updateSelectedButton(binding.btn1Y)
+        }
+    }
+
+    // --- Configura el gráfico ---
     private fun setupChart(history: List<Double>) {
         if (history.isEmpty()) return
 
         val entries = history.mapIndexed { index, value -> Entry(index.toFloat(), value.toFloat()) }
 
-         // 🔴🟢 Dynamic line color based on price trend
-        // If the last price is lower than the first, the line turns red (downtrend)
-        // Otherwise, it turns green (uptrend)
         val startPrice = history.first()
         val endPrice = history.last()
         val lineColor = if (endPrice < startPrice) Color.parseColor("#FF6666") else Color.parseColor("#4CAF50")
@@ -149,7 +187,20 @@ class DetailFragment : Fragment() {
         }
     }
 
-    // --- Formatters ---
+    // --- Actualiza el rango ---
+    private fun updateChart(days: String) {
+        currentCryptoId?.let { id ->
+            selectedDays = days
+            binding.progressBar.visibility = View.VISIBLE
+
+            lifecycleScope.launch {
+                vm.loadCryptoDetail(id, days)
+                Log.d("MARKET_DATA", "Requesting data: ID = $id | Days = $days")
+            }
+        }
+    }
+
+    // --- Formateadores ---
     private fun formatNumber(value: Double): String =
         String.format("%,.2f", value)
 
@@ -163,20 +214,7 @@ class DetailFragment : Fragment() {
         }
     }
 
-    // --- Change range ---
-    private fun updateChart(days: String) {
-        currentCryptoId?.let { id ->
-            selectedDays = days
-            binding.progressBar.visibility = View.VISIBLE
-
-            lifecycleScope.launch {
-                vm.loadCryptoDetail(id, days)
-                Log.d("MARKET_DATA", "Requesting data: ID = $id | Days = $days")
-            }
-        }
-    }
-
-    // --- Button styles ---
+    // --- Estilo del botón seleccionado ---
     private fun updateSelectedButton(selectedButton: Button) {
         val buttons = listOf(
             binding.btn1D,

@@ -8,7 +8,7 @@ interface CryptoRepository {
     suspend fun getMarkets( //suspend cuz it will work with coroutines
         vsCurrency:String = "USD",
         page: Int = 1,
-        perPage: Int = 50
+        perPage: Int = 50,
     ):List<CryptoModel>
 }
 

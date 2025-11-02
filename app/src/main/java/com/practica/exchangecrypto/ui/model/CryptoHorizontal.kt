@@ -5,5 +5,6 @@ data class CryptoHorizontal(
     val symbol: String,
     val price: String,
     val change: String,
-    val iconUrl: String
+    val iconUrl: String,
+    val sparkline: List<Double> = emptyList()
 )

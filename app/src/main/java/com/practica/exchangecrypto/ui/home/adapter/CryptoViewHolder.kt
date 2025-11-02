@@ -6,48 +6,46 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
+import com.robinhood.spark.SparkAdapter
+import com.robinhood.spark.SparkView
 import com.practica.exchangecrypto.R
 import com.practica.exchangecrypto.ui.model.CryptoItem
 
 class CryptoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+
     private val imgIcon: ImageView = itemView.findViewById(R.id.imgIcon)
     private val tvName: TextView = itemView.findViewById(R.id.tvName)
     private val tvSymbol: TextView = itemView.findViewById(R.id.tvSymbol)
     private val tvPrice: TextView = itemView.findViewById(R.id.tvPrice)
-    private val tvChange: TextView = itemView.findViewById((R.id.tvChange))
+    private val tvChange: TextView = itemView.findViewById(R.id.tvChange)
 
     fun bind(item: CryptoItem) {
-        // Load image from URL with Coil
+        // --- Load image from URL ---
         imgIcon.load(item.iconUrl) {
             crossfade(true)
-            placeholder(R.drawable.ic_placeholder) // while charging
-            error(R.drawable.ic_error) // if it fails
+            placeholder(R.drawable.ic_placeholder)
+            error(R.drawable.ic_error)
         }
 
-        // Assign text
+        // --- Bind text data ---
         tvName.text = item.name
         tvSymbol.text = item.symbol
         tvPrice.text = item.price
 
-        // --- MODIFIED SIGN AND COLOR LOGIC ---
+        // --- Handle price change text and color ---
         val changeText = item.change
+        val rawChangeValue = changeText.replace("%", "").toFloatOrNull() ?: 0f
 
-        if (changeText.contains("-")) {
-            // It's a descent
-            tvChange.text = changeText
-            tvChange.setTextColor(Color.RED)
-            // Assign down arrow
-            tvChange.setCompoundDrawablesWithIntrinsicBounds(
-                0, 0, R.drawable.ic_arrow_down, 0
-            )
+        tvChange.text = changeText
+        tvChange.setTextColor(Color.WHITE)
+        tvChange.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
+
+        if (rawChangeValue >= 0) {
+            tvChange.setBackgroundResource(R.drawable.bg_change_positive)
+            if (!changeText.startsWith("+") && rawChangeValue > 0)
+                tvChange.text = "+$changeText"
         } else {
-            // It's a climb
-            tvChange.text = "+$changeText"
-            tvChange.setTextColor(Color.GREEN) // O Color.parseColor("#4CAF50")
-            // Assign up arrow
-            tvChange.setCompoundDrawablesWithIntrinsicBounds(
-                0, 0, R.drawable.ic_arrow_up, 0
-            )
+            tvChange.setBackgroundResource(R.drawable.bg_change_negative)
         }
     }
 }
