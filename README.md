@@ -112,4 +112,4 @@ Exchange Crypto App was built as a learning and showcase project to explore **cl
 
 ### 📬 Contact
 ✉️ **ebrahimsantana35@gmail.com**  
-💼 **LinkedIn:** [Ebrahim Santana](https://www.linkedin.com/in/ebrahim-santana)
+💼 **LinkedIn:** [Ebrahim Santana](https://www.linkedin.com/in/ebrahim-santana-75a188301/)
