@@ -14,12 +14,14 @@ import com.practica.exchangecrypto.ui.home.adapter.CryptoAdapter
 import com.practica.exchangecrypto.ui.shared.SharedCryptoViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
+// Marks this fragment for Hilt dependency injection.
 @AndroidEntryPoint
 class FavoritesFragment : Fragment() {
 
     private var _binding: FragmentFavoritesBinding? = null
     private val binding get() = _binding!!
 
+    // Access the Shared ViewModel to get the list of favorite cryptocurrencies.
     private val sharedViewModel: SharedCryptoViewModel by activityViewModels()
     private lateinit var adapter: CryptoAdapter
 
@@ -35,16 +37,24 @@ class FavoritesFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
 
-        // 👀 Observamos los cambios en la lista de favoritos
+        // --- Observe changes in the favorites list ---
         sharedViewModel.favoriteCryptos.observe(viewLifecycleOwner) { favorites ->
+            // Update the RecyclerView adapter with the latest favorites list.
             adapter.updateList(favorites)
+            // Show or hide the empty list message based on the list size.
             binding.tvEmpty.visibility = if (favorites.isEmpty()) View.VISIBLE else View.GONE
         }
     }
 
+    /**
+     * Initializes the RecyclerView and its adapter, including the click listener for navigation.
+     */
     private fun setupRecyclerView() {
+        // Initialize the adapter with an empty list and a click listener.
         adapter = CryptoAdapter(mutableListOf(), sharedViewModel) { crypto ->
+            // Prepare the bundle to pass the selected crypto item to the detail screen.
             val bundle = Bundle().apply { putParcelable("crypto", crypto) }
+            // Navigate to the detail fragment.
             findNavController().navigate(R.id.action_favoritesFragment_to_detailFragment, bundle)
         }
 
@@ -57,4 +67,3 @@ class FavoritesFragment : Fragment() {
         _binding = null
     }
 }
-

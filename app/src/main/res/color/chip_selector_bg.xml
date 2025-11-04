@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Seleccionado -->
+    <item android:state_checked="true" android:color="#F1F7C2"/> <!-- Amarillo pastel -->
+    <!-- Normal -->
+    <item android:color="#1E1E1E"/> <!-- Gris muy oscuro -->
+</selector>

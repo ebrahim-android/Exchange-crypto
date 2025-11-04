@@ -16,6 +16,7 @@ fun CoinMarketDto.toDomain(): CryptoModel {
     )
 
     // 3. Retorna el modelo de dominio
+    val totalVolume = null
     return CryptoModel(
         id = id,
         symbol = symbol,
@@ -24,6 +25,7 @@ fun CoinMarketDto.toDomain(): CryptoModel {
         currentPrice = currentPrice ?: 0.0,
         marketCap = marketCap,
         priceChange24h = priceChangePercentage24h,
+        totalVolume = totalVolume,
         sparkline = sparklineData // Usa la variable registrada
     )
 }

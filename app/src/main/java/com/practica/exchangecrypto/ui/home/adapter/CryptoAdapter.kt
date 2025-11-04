@@ -9,31 +9,43 @@ import com.practica.exchangecrypto.ui.shared.SharedCryptoViewModel
 
 class CryptoAdapter(
     private var items: List<CryptoItem>,
-    private val sharedViewModel: SharedCryptoViewModel, // we inject the SharedCryptoViewModel
+    // Injects the SharedCryptoViewModel to potentially interact with shared state (though not used directly here).
+    private val sharedViewModel: SharedCryptoViewModel,
+    // Lambda function executed when an item is clicked.
     private val onItemClick: (CryptoItem) -> Unit
 ) : RecyclerView.Adapter<CryptoViewHolder>() {
 
+    /**
+     * Updates the data set and notifies the RecyclerView to redraw the list.
+     */
     fun updateList(newList: List<CryptoItem>) {
         items = newList
         notifyDataSetChanged()
     }
 
+    /**
+     * Inflates the layout for a single item view and returns the ViewHolder.
+     */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CryptoViewHolder {
         return CryptoViewHolder(
+            // Inflate the item layout (R.layout.item_crypto).
             LayoutInflater.from(parent.context).inflate(R.layout.item_crypto, parent, false)
         )
     }
 
     override fun getItemCount() = items.size
 
+    /**
+     * Binds the data to the ViewHolder and sets up the click listener.
+     */
     override fun onBindViewHolder(holder: CryptoViewHolder, position: Int) {
         val item = items[position]
         holder.bind(item)
+
+        // Set up the click listener for navigation or interaction.
         holder.itemView.setOnClickListener {
-            onItemClick(item) // we pass the selected CryptoItem
+            onItemClick(item) // Executes the lambda passing the selected CryptoItem.
         }
 
     }
 }
-
-

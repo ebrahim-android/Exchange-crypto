@@ -22,6 +22,7 @@ class CryptoRepositoryImpl @Inject constructor(
             per_page = perPage, //it dosen't matter
             page = page, //it dosen't matter
             sparkline = true, //to graphic
+            total_volume = "24h", //We ask that you return the total volume within 24 hours.
             price_change_percentage = "24h" //We ask that you return the price change within 24 hours.
         )
         Log.d("API_RAW", "First 5 coins sparkline sizes: ${dtos.take(5).map { it.sparklineIn7d?.price?.size }}")
