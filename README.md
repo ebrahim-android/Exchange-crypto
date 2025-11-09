@@ -79,8 +79,6 @@ The app fetches real-time cryptocurrency market data from **CoinGecko API** and 
 │
 └── ⚙️ utils/ → Helper classes, formatters, constants
 
-yaml
-Copy code
 
 ---
 
